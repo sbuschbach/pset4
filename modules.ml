@@ -21,16 +21,15 @@ end
 module Math: MATH =
 struct
    let pi = 4. *. atan(1.)
-   let cos x = cos(x)
-   let sin x = sin(x)
+   let cos x = cos (x)
+   let sin x = sin (x)
    let sum x y = x +. y
    let max lst = 
      match lst with
-     | [] -> None
-     | _ -> Some (List.fold_right lst ~init:0.
-                ~f:(fun x y -> if x > y then x else y))
+     |[] -> None
+     |_ -> Some (List.fold_right lst 
+  ~f:(fun x y -> (if x > y then x else y)) ~init:0.)
 end
-
 
 (*>* Problem 1.1 *>*)
 
@@ -42,10 +41,10 @@ end
 *)
 
 
-module type LIST =
+module type LIST  =
 sig
   val length : 'a list -> int
-  val fold_right : 'a list -> f:('a -> 'b -> 'b) -> init:'b -> 'b
+  val fold_right : 'a list -> f:('a -> 'b -> 'b) -> init: 'b -> 'b
   val rev : 'a list -> 'a list
 end
 
@@ -63,11 +62,12 @@ let _ =
     assert(MyList.rev [1;2;3] = [3;2;1])
 
 
-(*Even with your signature, the following line should never compile:
+
+(* Even with your signature, the following line should never compile:
 
 MyList.fold_left ~f:(+) ~init:0 [1;2;3]
-
 *)
+
 
 
 (*>* Problem 1.2 *>*)
@@ -153,22 +153,13 @@ end
 
 (* Write a signature TF that exposes as much of *both* Ben
  * and Allison as possible. *)
- 
-module type TF =
+
+module type TF  = 
 sig
-  type info = {
-    hometown : string;
-    house : string;
-    year : int;
-    concentration : string;
-  }
-  val hometown : string
-  val house : 
-  val info : info
-  val least_favorite_function : 'a -> 'a -> 'a
-  val favorite_function : 
-  val grade_assignment : 'a -> string
-  val print_info : 'a -> unit
+  type info
+  val print_info : unit -> unit
+  val favorite_function : float -> float -> float
+  val hometown : bytes
   val fold : int list -> init:int -> int
 end
 

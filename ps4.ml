@@ -204,10 +204,10 @@ struct
       match lst with
       | [] -> failwith "Invalid tree: empty list as node"
       | hd::_ ->
-match C.compare x hd with
-|Equal -> Branch(left,x::lst,right)
-|Less -> Branch(insert x left,lst,right)
-|Greater -> Branch(left,lst,insert x right)
+	match C.compare x hd with
+	|Equal -> Branch(left,x::lst,right)
+	|Less -> Branch(insert x left,lst,right)
+	|Greater -> Branch(left,lst,insert x right)
 
 (*>* Problem 2.1 *>*)
 
@@ -228,10 +228,10 @@ match C.compare x hd with
       match lst with
       | [] -> failwith "Invalid tree: empty list as node"
       | hd::_ ->
-match C.compare x hd with
-|Less -> search x left
-|Greater -> search x right
-|Equal -> lst_search x lst
+	match C.compare x hd with
+	|Less -> search x left
+	|Greater -> search x right
+	|Equal -> lst_search x lst
 
   (* A useful function for removing the node with the minimum value from
    * a binary tree, returning that node and the new tree.
@@ -731,54 +731,35 @@ struct
   (* Takes a tree, and if the top node is greater than its children, fixes
    * it. If fixing it results in a subtree where the node is greater than its
    * children, then you must (recursively) fix this tree too. *)
-<<<<<<< HEAD
-  let rec fix (t : tree) : tree = 
-    match t with
-    | Leaf(e) -> t
-    
-    | OneBranch(e1,e2) ->
-      (match C.compare e1 e2 with
-      | Equal | Greater -> OneBranch(e2,e1)
-      | Less -> OneBranch(e1,e2))
-      
-    | TwoBranch(sym,e1,t1,t2) -> 
-      if C.compare e1 (get_top t2) = Greater then
-	    TwoBranch(sym, get_top t2, fix t1, fix (add e1 t2))
-      else if C.compare e1 (get_top t1) = Greater then 
-	    TwoBranch(sym, get_top t1, fix (add e1 t1), fix t2)
-      else TwoBranch(sym,e1,t1,t2)
-
-=======
   let rec fix (t : tree) : tree =
       match t with
       | Leaf(_) -> t
 
       | OneBranch(e1,e2) ->
-(match C.compare e1 e2 with
-| Equal | Greater -> OneBranch(e2,e1)
-| Less -> OneBranch(e1,e2))
+	(match C.compare e1 e2 with
+	| Equal | Greater -> OneBranch(e2,e1)
+	| Less -> OneBranch(e1,e2))
 
       | TwoBranch(sym,e1,t1,t2) -> 
-if C.compare e1 (get_top t2) = Greater then
- (match t2 with
- | Leaf(t2_hd) -> fix(TwoBranch(sym,t2_hd,t1,Leaf(e1)))
- | OneBranch(t2_hd,t2_tl) -> fix(TwoBranch(sym,t2_hd,t1,
-   fix(OneBranch(e1,t2_tl))))
- | TwoBranch(sym,t2_hd,t2_t1,t2_t2) ->
-   fix(TwoBranch(sym,t2_hd,t1,fix(TwoBranch(sym,e1,t2_t1,t2_t2)))))
+	if C.compare e1 (get_top t2) = Greater then
+	  (match t2 with
+	  | Leaf(t2_hd) -> fix(TwoBranch(sym,t2_hd,t1,Leaf(e1)))
+	  | OneBranch(t2_hd,t2_tl) -> fix(TwoBranch(sym,t2_hd,t1,
+						    fix(OneBranch(e1,t2_tl))))
+	  | TwoBranch(sym,t2_hd,t2_t1,t2_t2) ->
+	    fix(TwoBranch(sym,t2_hd,t1,fix(TwoBranch(sym,e1,t2_t1,t2_t2)))))
 
-else if C.compare e1 (get_top t1) = Greater then  
- (match t1 with
- | Leaf(t1_hd) -> fix(TwoBranch(sym,t1_hd,Leaf(e1),t2)) 
- | OneBranch(t1_hd,t1_tl) -> fix(TwoBranch(sym,t1_hd,
-   fix(OneBranch(e1,t1_tl)),t2))
- | TwoBranch(sym,t1_hd,t1_t1,t1_t2) ->
-   fix(TwoBranch(sym,t1_hd,fix(TwoBranch(sym,e1,t1_t1,t1_t2)),t2)))
+	else if C.compare e1 (get_top t1) = Greater then  
+	  (match t1 with
+	  | Leaf(t1_hd) -> fix(TwoBranch(sym,t1_hd,Leaf(e1),t2)) 
+	  | OneBranch(t1_hd,t1_tl) -> fix(TwoBranch(sym,t1_hd,
+						    fix(OneBranch(e1,t1_tl)),t2))
+	  | TwoBranch(sym,t1_hd,t1_t1,t1_t2) ->
+	    fix(TwoBranch(sym,t1_hd,fix(TwoBranch(sym,e1,t1_t1,t1_t2)),t2)))
 
-else 
- TwoBranch(sym,e1,t1,t2)
-     
->>>>>>> 8a17b6920dbe1b7ef540a978acc28ec4be347a27
+	else 
+	  TwoBranch(sym,e1,t1,t2)
+	      
   let extract_tree (q : queue) : tree =
     match q with
     | Empty -> raise QueueEmpty

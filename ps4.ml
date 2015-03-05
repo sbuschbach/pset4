@@ -513,12 +513,12 @@ struct
   (* Implement the remainder of the module! *)
   
   type elt = C.t
-  type tree = Leaf | Branch of tree * elt list * tree
-  type queue = tree
+
+  type queue = T.tree
   
   let empty = T.empty
   
-  let is_empty (t : queue) = if t = Leaf then true else false
+  let is_empty (t : queue) = if t = T.empty then true else false
 
   let add (e : elt) (q : queue) = T.insert e q
                                       
@@ -526,7 +526,7 @@ struct
   
   (* Testing Functions *)
   let empty_test =
-    assert (empty = Leaf)
+    assert (empty = T.empty)
   
   let is_empty_test =
     assert (is_empty empty = true)

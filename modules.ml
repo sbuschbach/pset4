@@ -53,14 +53,12 @@ end
  * can uncomment them *)
 
 
-
 module MyList = (List : LIST);;
 
 let _ =
     assert(MyList.length [1;2;3] = 3);
     assert(MyList.fold_right ~f:(+) ~init:0 [1;2;3] = 6);
     assert(MyList.rev [1;2;3] = [3;2;1])
-
 
 
 (* Even with your signature, the following line should never compile:

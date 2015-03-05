@@ -389,7 +389,6 @@ struct
     assert (getmin (insert x3 (insert x (insert x2 empty))) = x);
     ()
  
-
   let test_delete () =
     let x = C.generate () in
     let x2 = C.generate_lt x () in
@@ -568,7 +567,7 @@ struct
   (* Implement the remainder of the module! *)
   
   type elt = C.t
-
+  
   type queue = T.tree
   
   let empty = T.empty
@@ -581,12 +580,14 @@ struct
   
   (* Testing Functions *)
   let empty_test =
-    assert (empty = T.empty)
+    assert (empty = T.empty);
+    ()
   
   let is_empty_test =
-    assert (is_empty empty = true)
+    assert (is_empty empty = true);
     let x = C.generate () in
-    assert (is_empty (add x empty) = false)
+    assert (is_empty (add x empty) = false);
+    ()
     
   let add_test = 
     let x = C.generate () in
@@ -732,33 +733,32 @@ struct
    * it. If fixing it results in a subtree where the node is greater than its
    * children, then you must (recursively) fix this tree too. *)
   let rec fix (t : tree) : tree =
-      match t with
-      | Leaf(_) -> t
+    match t with
+    | Leaf(_) -> t
 
-      | OneBranch(e1,e2) ->
-	(match C.compare e1 e2 with
-	| Equal | Greater -> OneBranch(e2,e1)
-	| Less -> OneBranch(e1,e2))
+    | OneBranch(e1,e2) ->
+	    (match C.compare e1 e2 with
+	     | Equal | Greater -> OneBranch(e2,e1)
+	     | Less -> OneBranch(e1,e2))
 
-      | TwoBranch(sym,e1,t1,t2) -> 
-	if C.compare e1 (get_top t2) = Greater then
-	  (match t2 with
-	  | Leaf(t2_hd) -> fix(TwoBranch(sym,t2_hd,t1,Leaf(e1)))
-	  | OneBranch(t2_hd,t2_tl) -> fix(TwoBranch(sym,t2_hd,t1,
-						    fix(OneBranch(e1,t2_tl))))
-	  | TwoBranch(sym,t2_hd,t2_t1,t2_t2) ->
-	    fix(TwoBranch(sym,t2_hd,t1,fix(TwoBranch(sym,e1,t2_t1,t2_t2)))))
+    | TwoBranch(sym,e1,t1,t2) -> 
+	    if C.compare e1 (get_top t2) = Greater then
+	     (match t2 with
+	     | Leaf(t2_hd) -> fix(TwoBranch(sym,t2_hd,t1,Leaf(e1)))
+	     | OneBranch(t2_hd,t2_tl) -> fix(TwoBranch(sym,t2_hd,t1,
+     	    fix(OneBranch(e1,t2_tl))))
+	     | TwoBranch(sym,t2_hd,t2_t1,t2_t2) ->
+            fix(TwoBranch(sym,t2_hd,t1,fix(TwoBranch(sym,e1,t2_t1,t2_t2)))))
 
-	else if C.compare e1 (get_top t1) = Greater then  
-	  (match t1 with
-	  | Leaf(t1_hd) -> fix(TwoBranch(sym,t1_hd,Leaf(e1),t2)) 
-	  | OneBranch(t1_hd,t1_tl) -> fix(TwoBranch(sym,t1_hd,
-						    fix(OneBranch(e1,t1_tl)),t2))
-	  | TwoBranch(sym,t1_hd,t1_t1,t1_t2) ->
-	    fix(TwoBranch(sym,t1_hd,fix(TwoBranch(sym,e1,t1_t1,t1_t2)),t2)))
+        else if C.compare e1 (get_top t1) = Greater then  
+	     (match t1 with
+	     | Leaf(t1_hd) -> fix(TwoBranch(sym,t1_hd,Leaf(e1),t2)) 
+	     | OneBranch(t1_hd,t1_tl) -> fix(TwoBranch(sym,t1_hd,
+						               fix(OneBranch(e1,t1_tl)),t2))
+         | TwoBranch(sym,t1_hd,t1_t1,t1_t2) ->
+	         fix(TwoBranch(sym,t1_hd,fix(TwoBranch(sym,e1,t1_t1,t1_t2)),t2)))
 
-	else 
-	  TwoBranch(sym,e1,t1,t2)
+	    else TwoBranch(sym,e1,t1,t2)
 	      
   let extract_tree (q : queue) : tree =
     match q with
@@ -826,8 +826,9 @@ struct
     | TwoBranch (Odd, e, t1, t2) -> 
       let (last, q1') = get_last t1 in
       (match q1' with
-      | Empty -> (e, Tree (fix (OneBranch (last, get_top t2))))
-      | Tree t1' -> (e, Tree (fix (TwoBranch (Even, last, t1', t2)))))
+       | Empty -> (e, Tree (fix (OneBranch (last, get_top t2))))
+       | Tree t1' -> (e, Tree (fix (TwoBranch (Even, last, t1', t2)))))
+       
 (*
   let size (t:tree) : balance =
     let rec tree_size (t:tree) : int =
@@ -838,13 +839,17 @@ struct
     if ((tree_size t) mod 2 = 0) then Even
     else Odd
 *)
+
+  (*Testing Functions *)
   let empty_test =
-    assert (empty = Empty)
+    assert (empty = Empty);
+    ()
   
   let is_empty_test =
-    assert (is_empty empty = true)
+    assert (is_empty empty = true);
     let x = C.generate () in
-    assert (is_empty (add x empty) = false)
+    assert (is_empty (add x empty) = false);
+    ()
       
   let add_test =
     let x = C.generate () in
@@ -901,11 +906,9 @@ where i add the variables onto the tree...but add is a queue *)
     take_test;*)
     fix_test;
     
-
 end
 
 module BinHeapPriQ = BinaryHeap(IntCompare)
-
 let _ = BinHeapPriQ.run_tests()
 
 (* Now to actually use our priority queue implementations for something useful!
@@ -930,17 +933,13 @@ module IntListQueue = (ListQueue(IntCompare) :
                         PRIOQUEUE with type elt = IntCompare.t)
 module IntHeapQueue = (BinaryHeap(IntCompare) :
                         PRIOQUEUE with type elt = IntCompare.t)
-(*
 module IntTreeQueue = (TreeQueue(IntCompare) :
                         PRIOQUEUE with type elt = IntCompare.t)
-*)
 
 (* store the whole modules in these variables *)
 let list_module = (module IntListQueue : PRIOQUEUE with type elt = IntCompare.t)
 let heap_module = (module IntHeapQueue : PRIOQUEUE with type elt = IntCompare.t)
-(*
 let tree_module = (module IntTreeQueue : PRIOQUEUE with type elt = IntCompare.t)
-*)
 
 (* Implements sort using generic priority queues. *)
 let sort (m : (module PRIOQUEUE with type elt=IntCompare.t)) (lst : int list) =
@@ -953,7 +952,6 @@ let sort (m : (module PRIOQUEUE with type elt=IntCompare.t)) (lst : int list) =
   let pq = List.fold_right ~f:P.add ~init:P.empty lst in
   List.rev (extractor pq [])
 
-
 (* Hurray!! Now, we can pass in the modules into sort and get out
  * different sorts!! *)
 
@@ -964,10 +962,7 @@ let heapsort = sort heap_module
 (* Sorting with a priority queue with your underlying tree
  * implementation is *almost* equivalent to treesort;
  * a real treesort relies on self-balancing binary search trees *)
-
-(*
 let treesort = sort tree_module
-*)
 
 (* Sorting with a priority queue with an underlying unordered list
  * implementation is equivalent to heap sort! If your implementation of
@@ -999,7 +994,7 @@ let selectionsort = sort list_module
  * Of course include your code for how you performed the measurements below.
  * Be convincing when establishing the algorithmic complexity of each sort.
  * See the Sys module for functions related to keeping track of time *)
-(*
+
 (*>* Problem N.2 *>*)
-let minutes_spent : int = raise ImplementMe
-*)
+let minutes_spent : int = 1000;;
+

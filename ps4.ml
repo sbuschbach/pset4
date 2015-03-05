@@ -1,6 +1,6 @@
 (* PS4
- * Author: Cindy Zou
- * Partner: Steve Buschbach
+ * Author: Steven Buschbach
+ * Partner: Cindy Zou
  *)
 
 (* NOTE: Please read (and understand) all of the comments in this file! 
@@ -197,7 +197,6 @@ struct
    * Hint: use C.compare. See delete for inspiration
    *)
 
-
   let rec insert (x : elt) (t : tree) : tree =
     match t with
     | Leaf -> Branch(Leaf,[x],Leaf)
@@ -206,7 +205,7 @@ struct
       | [] -> failwith "Invalid tree: empty list as node"
       | hd::_ ->
 	match C.compare x hd with
-	|Equal -> Branch(left,x::(List.rev lst),right)
+	|Equal -> Branch(left,x::lst,right)
 	|Less -> Branch(insert x left,lst,right)
 	|Greater -> Branch(left,lst,insert x right)
 
@@ -299,10 +298,7 @@ struct
     match List.rev min with 
     | [] -> failwith "Invalid tree: empty list as node"
     | hd::_ -> hd
-      
-      
-      
-
+            
 (*>* Problem 2.3 *>*)
 
   (* Simply returns the maximum value of the tree t. Similarly should
@@ -312,7 +308,7 @@ struct
     match t with
     | Leaf -> raise EmptyTree
     | Branch (l, v, Leaf) -> (v, l)
-    | Branch (l, v, _) -> let max, t' = pull_max l in (max, Branch (l, v, t'))
+    | Branch (l, v, r) -> let max, t' = pull_max r in (max, Branch (l, v, t'))
 
   let getmax (t : tree) : elt = 
     let (max, _) = pull_max t in
@@ -380,7 +376,8 @@ struct
     let x = C.generate () in
     let x2 = C.generate_lt x () in
     let x3 = C.generate_lt x2 () in
-    assert (getmax (insert x3 (insert x (insert x2 empty))) = x)
+    let after_ins = (insert x3 (insert x (insert x2 empty))) in
+    assert (getmax after_ins = x)
     let x = C.generate () in
     let x2 = C.generate_lt x () in
     let x3 = C.generate_lt x2 () in

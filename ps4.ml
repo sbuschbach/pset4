@@ -804,7 +804,11 @@ struct
        | Empty -> (e, Tree (fix (OneBranch (last, get_top t1))))
        | Tree t2' -> (e, Tree (fix (TwoBranch (Odd, last, t1, t2')))))
     (* Implement the odd case! *)
-    | TwoBranch (Odd, e, t1, t2) -> raise ImplementMe
+    | TwoBranch (Odd, e, t1, t2) -> 
+      let (last, q1') = get_last t1 in
+      (match q1' with
+      | Empty -> (e, Tree (fix (OneBranch (last, get_top t2))))
+      | Tree t1' -> (e, Tree (fix (TwoBranch (Even, last, t1', t2)))))
 
   let run_tests () = raise ImplementMe
 end

@@ -840,7 +840,7 @@ struct
     else Odd
 *)
 
-  (*Testing Functions *)
+(*Testing Functions *)
   let empty_test =
     assert (empty = Empty);
     ()
@@ -896,14 +896,44 @@ where i add the variables onto the tree...but add is a queue *)
     let t = (TwoBranch(Odd,x3,OneBranch(x,x2),Leaf(x4))) in
     assert (fix t = TwoBranch(Odd,x,OneBranch(x2,x3),Leaf(x4)));
     ()
-
+  
+  let get_last_test = 
+    let x = C.generate () in
+    let x2 = C.generate_gt x () in
+    let x3 = C.generate_gt x2 () in
+    let x4 = C.generate_gt x3 () in
+    let t = (TwoBranch(Odd,x,OneBranch(x2,x4),Leaf(x3))) in
+    assert (get_last t = (x4, Tree(TwoBranch(Even,x,Leaf(x2),Leaf(x3)))));
+    let t2 = (TwoBranch(Even,x,Leaf(x2),Leaf(x3))) in
+    assert (get_last t2 = (x3, Tree(OneBranch(x,x2))));
+    let t3 = (OneBranch(x,x2)) in
+    assert (get_last t3 = (x2, Tree(Leaf(x))));
+    let t4 = (Leaf(x)) in
+    assert (get_last t4 = (x, Empty));
+    ()
+  
+  let take_test =
+    let x = C.generate () in
+    let x2 = C.generate_gt x () in
+    let x3 = C.generate_gt x2 () in
+    let x4 = C.generate_gt x3 () in
+    (*let t = Tree(TwoBranch(Odd,x,OneBranch(x2,x4),Leaf(x3))) in
+    assert (take t = (x, Tree(TwoBranch(Even,x4,Leaf(x2),Leaf(x3)))));
+    let t2 = Tree(TwoBranch(Even,x,Leaf(x2),Leaf(x3))) in
+    assert (take t2 = (x, Tree(OneBranch(x3,x2))));*)
+    let t3 = Tree(OneBranch(x,x2)) in
+    assert (take t3 = (x, Tree(Leaf(x2))));
+    let t4 = Tree(Leaf(x)) in
+    assert (take t4 = (x, Empty));
+    ()
+  
   let run_tests () =
     is_empty_test;
     empty_test;
     add_test;
     get_top_test;
-    (*get_last_test;
-    take_test;*)
+    get_last_test;
+    take_test;
     fix_test;
     
 end

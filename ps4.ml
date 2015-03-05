@@ -1,6 +1,6 @@
 (* PS4
- * Author: Steven Buschbach
- * Partner: Cindy Zou
+ * Author: Cindy Zou
+ * Partner: Steve Buschbach
  *)
 
 (* NOTE: Please read (and understand) all of the comments in this file! 
@@ -197,19 +197,18 @@ struct
    * Hint: use C.compare. See delete for inspiration
    *)
 
-  (* is it ok to just put e?  left, [e], right, i know this gives me
-   * an elt list, but what happens when I compare x and e?  does this not work? *)
+
   let rec insert (x : elt) (t : tree) : tree =
     match t with
     | Leaf -> Branch(Leaf,[x],Leaf)
     | Branch(left,lst,right) ->
       match lst with
       | [] -> failwith "Invalid tree: empty list as node"
-      | hd::tl ->
+      | hd::_ ->
 	match C.compare x hd with
-	|Equal -> Branch(left,x::hd::tl,right)
-	|Less -> Branch(insert x left, hd::tl, right)
-	|Greater -> Branch(left, hd::tl, insert x right)
+	|Equal -> Branch(left,x::(List.rev lst),right)
+	|Less -> Branch(insert x left,lst,right)
+	|Greater -> Branch(left,lst,insert x right)
 
 (*>* Problem 2.1 *>*)
 
@@ -374,14 +373,32 @@ struct
     let x2 = C.generate_lt x () in
     let x3 = C.generate_lt x2 () in
     let x4 = C.generate_lt x3 () in
-    assert (getmax (insert x4 (insert x3 (insert x2 (insert x empty)))) = x)
-
+    let after_ins = (insert x4 (insert x3 (insert x2 (insert x empty)))) in
+    assert (getmax after_ins = x)
+    let x = C.generate () in
+    assert (getmax (insert x empty) = x)
+    let x = C.generate () in
+    let x2 = C.generate_lt x () in
+    let x3 = C.generate_lt x2 () in
+    assert (getmax (insert x3 (insert x (insert x2 empty))) = x)
+    let x = C.generate () in
+    let x2 = C.generate_lt x () in
+    let x3 = C.generate_lt x2 () in
+    assert (getmax (insert x2 (insert x (insert x3 empty))) = x)
+   
   let test_getmin () =
     let x = C.generate () in
     let x2 = C.generate_gt x () in
     let x3 = C.generate_gt x2 () in
     let x4 = C.generate_gt x3 () in
     assert (getmin (insert x2 (insert x4 (insert x (insert x3 empty)))) = x)
+    let x = C.generate () in 
+    assert (getmin (insert x empty) = x)
+    let x = C.generate () in
+    let x2 = C.generate_gt x () in
+    let x3 = C.generate_gt x2 () in
+    assert (getmin (insert x3 (insert x (insert x2 empty))) = x)
+ 
 
   let test_delete () =
     let x = C.generate () in
@@ -415,6 +432,7 @@ module IntTree = BinSTree(IntCompare)
  * testing works.
  *)
 let _ = IntTree.run_tests ()
+
 
 (*****************************************************************************)
 (*                               Part 3                                      *)

@@ -1,6 +1,6 @@
 (* PS4
- * Author: Steven Buschbach
- * Partner: Cindy Zou
+ * Author: Cindy Zou
+ * Partner: Steve Buschbach
  *)
 
 (* NOTE: Please read (and understand) all of the comments in this file! 
@@ -196,7 +196,20 @@ struct
    *
    * Hint: use C.compare. See delete for inspiration
    *)
-  let rec insert (x : elt) (t : tree) : tree = raise ImplementMe
+
+  (* is it ok to just put e?  left, [e], right, i know this gives me
+   * an elt list, but what happens when I compare x and e?  does this not work? *)
+  let rec insert (x : elt) (t : tree) : tree =
+    match t with
+    | Leaf -> Branch(Leaf,[x],Leaf)
+    | Branch(left,lst,right) ->
+      match lst with
+      | [] -> failwith "Invalid tree: empty list as node"
+      | hd::tl ->
+	match C.compare x hd with
+	|Equal -> Branch(left,x::hd::tl,right)
+	|Less -> Branch(insert x left, hd::tl, right)
+	|Greater -> Branch(left, hd::tl, insert x right)
 
 (*>* Problem 2.1 *>*)
 
@@ -205,7 +218,22 @@ struct
    * that doesn't necessarily mean that x itself is in the
    * tree.
    *)
-  let rec search (x : elt) (t : tree) : bool = raise ImplementMe
+  let rec search (x : elt) (t : tree) : bool = 
+    let rec lst_search (x : elt) (lst: elt list) : bool  =
+      match lst with
+      | [] -> false
+      | hd::tl -> if x = hd then true else lst_search x tl
+    in 
+    match t with
+    | Leaf -> raise EmptyTree
+    | Branch(left,lst,right) ->
+      match lst with
+      | [] -> failwith "Invalid tree: empty list as node"
+      | hd::_ ->
+	match C.compare x hd with
+	|Less -> search x left
+	|Greater -> search x right
+	|Equal -> lst_search x lst
 
   (* A useful function for removing the node with the minimum value from
    * a binary tree, returning that node and the new tree.
@@ -267,14 +295,32 @@ struct
    * The exception "EmptyTree", defined within this module, might come in
    * handy. *)
 
-  let getmin (t : tree) : elt = raise ImplementMe
+  let getmin (t : tree) : elt = 
+    let (min, _) = pull_min t in 
+    match List.rev min with 
+    | [] -> failwith "Invalid tree: empty list as node"
+    | hd::_ -> hd
+      
+      
+      
 
 (*>* Problem 2.3 *>*)
 
   (* Simply returns the maximum value of the tree t. Similarly should
    * return the last element in the matching list. *)
-  let rec getmax (t : tree) : elt = raise ImplementMe
+ 
+  let rec pull_max (t : tree) : elt list * tree =
+    match t with
+    | Leaf -> raise EmptyTree
+    | Branch (l, v, Leaf) -> (v, l)
+    | Branch (l, v, _) -> let max, t' = pull_max l in (max, Branch (l, v, t'))
 
+  let getmax (t : tree) : elt = 
+    let (max, _) = pull_max t in
+    match List.rev max with 
+    | [] -> failwith "Invalid tree: empty list as node"
+    | hd::_ -> hd
+    
   let test_insert () =
     let x = C.generate () in
     let t = insert x empty in

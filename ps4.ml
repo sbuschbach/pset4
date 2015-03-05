@@ -204,10 +204,10 @@ struct
       match lst with
       | [] -> failwith "Invalid tree: empty list as node"
       | hd::_ ->
-	match C.compare x hd with
-	|Equal -> Branch(left,x::lst,right)
-	|Less -> Branch(insert x left,lst,right)
-	|Greater -> Branch(left,lst,insert x right)
+match C.compare x hd with
+|Equal -> Branch(left,x::lst,right)
+|Less -> Branch(insert x left,lst,right)
+|Greater -> Branch(left,lst,insert x right)
 
 (*>* Problem 2.1 *>*)
 
@@ -228,10 +228,10 @@ struct
       match lst with
       | [] -> failwith "Invalid tree: empty list as node"
       | hd::_ ->
-	match C.compare x hd with
-	|Less -> search x left
-	|Greater -> search x right
-	|Equal -> lst_search x lst
+match C.compare x hd with
+|Less -> search x left
+|Greater -> search x right
+|Equal -> lst_search x lst
 
   (* A useful function for removing the node with the minimum value from
    * a binary tree, returning that node and the new tree.
@@ -369,32 +369,25 @@ struct
     let x2 = C.generate_lt x () in
     let x3 = C.generate_lt x2 () in
     let x4 = C.generate_lt x3 () in
-    let after_ins = (insert x4 (insert x3 (insert x2 (insert x empty)))) in
-    assert (getmax after_ins = x)
-    let x = C.generate () in
-    assert (getmax (insert x empty) = x)
-    let x = C.generate () in
-    let x2 = C.generate_lt x () in
-    let x3 = C.generate_lt x2 () in
-    let after_ins = (insert x3 (insert x (insert x2 empty))) in
-    assert (getmax after_ins = x)
-    let x = C.generate () in
-    let x2 = C.generate_lt x () in
-    let x3 = C.generate_lt x2 () in
-    assert (getmax (insert x2 (insert x (insert x3 empty))) = x)
+    assert (getmax (insert x empty) = x);
+    assert (getmax (insert x3 (insert x (insert x2 empty))) = x);
+    assert (getmax (insert x2 (insert x (insert x3 empty))) = x);
+    let t = (insert x4 (insert x3 (insert x2 (insert x empty)))) in
+    assert (getmax t = x);
+    let x5 = C.generate_gt x () in
+    let t = insert x5 t in
+    assert (getmax t = x5);
+    ()
    
   let test_getmin () =
     let x = C.generate () in
     let x2 = C.generate_gt x () in
     let x3 = C.generate_gt x2 () in
     let x4 = C.generate_gt x3 () in
-    assert (getmin (insert x2 (insert x4 (insert x (insert x3 empty)))) = x)
-    let x = C.generate () in 
-    assert (getmin (insert x empty) = x)
-    let x = C.generate () in
-    let x2 = C.generate_gt x () in
-    let x3 = C.generate_gt x2 () in
-    assert (getmin (insert x3 (insert x (insert x2 empty))) = x)
+    assert (getmin (insert x empty) = x);
+    assert (getmin (insert x2 (insert x4 (insert x (insert x3 empty)))) = x);
+    assert (getmin (insert x3 (insert x (insert x2 empty))) = x);
+    ()
  
 
   let test_delete () =
@@ -403,7 +396,8 @@ struct
     let x3 = C.generate_lt x2 () in
     let x4 = C.generate_lt x3 () in
     let after_ins = insert x4 (insert x3 (insert x2 (insert x empty))) in
-    assert (delete x (delete x4 (delete x3 (delete x2 after_ins))) = empty)
+    assert (delete x (delete x4 (delete x3 (delete x2 after_ins))) = empty);
+    ()
 
   let run_tests () =
     test_insert ();
@@ -597,24 +591,22 @@ struct
   let add_test = 
     let x = C.generate () in
     let x2 = C.generate_lt x () in
-    assert (add x (add x2 empty) = T.insert x (T.insert x2 T.empty))
-    let x = C.generate () in
-    assert (add x empty = T.insert x T.empty)
-    let x = C.generate () in
+    assert (add x (add x2 empty) = T.insert x (T.insert x2 T.empty));
+    assert (add x empty = T.insert x T.empty);
     let x3 = C.generate_gt x () in
-    assert (add x (add x3 empty) = T.insert x (T.insert x3 T.empty))
-    let x = C.generate () in
+    assert (add x (add x3 empty) = T.insert x (T.insert x3 T.empty));
     let x4 = x in
-    assert (add x (add x4 empty) = T.insert x (T.insert x4 T.empty))
+    assert (add x (add x4 empty) = T.insert x (T.insert x4 T.empty));
+    ()
   
   let take_test = 
     let x = C.generate () in
     let x2 = C.generate_lt x () in
     let x3 = C.generate_gt x () in
     assert (take (add x (add x2 (add x3 empty))) = 
-              (x2, (T.insert x (T.insert x3 T.empty))))
-    let x = C.generate () in
-    assert (take (add x empty) = (x, T.empty))
+              (x2, (T.insert x (T.insert x3 T.empty))));
+    assert (take (add x empty) = (x, T.empty));
+    ()
     
   let run_tests () = 
     take_test ;
@@ -730,7 +722,7 @@ struct
 
   (* Simply returns the top element of the tree t (i.e., just a single pattern
    * match in *)
-  let get_top (t : tree) : elt =
+  let get_top (t : tree) : elt = 
     match t with
     | Leaf(e) -> e
     | OneBranch(e,_) -> e
@@ -739,6 +731,7 @@ struct
   (* Takes a tree, and if the top node is greater than its children, fixes
    * it. If fixing it results in a subtree where the node is greater than its
    * children, then you must (recursively) fix this tree too. *)
+<<<<<<< HEAD
   let rec fix (t : tree) : tree = 
     match t with
     | Leaf(e) -> t
@@ -755,6 +748,37 @@ struct
 	    TwoBranch(sym, get_top t1, fix (add e1 t1), fix t2)
       else TwoBranch(sym,e1,t1,t2)
 
+=======
+  let rec fix (t : tree) : tree =
+      match t with
+      | Leaf(_) -> t
+
+      | OneBranch(e1,e2) ->
+(match C.compare e1 e2 with
+| Equal | Greater -> OneBranch(e2,e1)
+| Less -> OneBranch(e1,e2))
+
+      | TwoBranch(sym,e1,t1,t2) -> 
+if C.compare e1 (get_top t2) = Greater then
+ (match t2 with
+ | Leaf(t2_hd) -> fix(TwoBranch(sym,t2_hd,t1,Leaf(e1)))
+ | OneBranch(t2_hd,t2_tl) -> fix(TwoBranch(sym,t2_hd,t1,
+   fix(OneBranch(e1,t2_tl))))
+ | TwoBranch(sym,t2_hd,t2_t1,t2_t2) ->
+   fix(TwoBranch(sym,t2_hd,t1,fix(TwoBranch(sym,e1,t2_t1,t2_t2)))))
+
+else if C.compare e1 (get_top t1) = Greater then  
+ (match t1 with
+ | Leaf(t1_hd) -> fix(TwoBranch(sym,t1_hd,Leaf(e1),t2)) 
+ | OneBranch(t1_hd,t1_tl) -> fix(TwoBranch(sym,t1_hd,
+   fix(OneBranch(e1,t1_tl)),t2))
+ | TwoBranch(sym,t1_hd,t1_t1,t1_t2) ->
+   fix(TwoBranch(sym,t1_hd,fix(TwoBranch(sym,e1,t1_t1,t1_t2)),t2)))
+
+else 
+ TwoBranch(sym,e1,t1,t2)
+     
+>>>>>>> 8a17b6920dbe1b7ef540a978acc28ec4be347a27
   let extract_tree (q : queue) : tree =
     match q with
     | Empty -> raise QueueEmpty
@@ -773,7 +797,7 @@ struct
    * down into a new node at the bottom of the tree. *This* is the node
    * that we want you to return.
    *)
-  let rec get_last (t : tree) : elt * queue = 
+  let get_last (t : tree) : elt * queue = 
     (* Function to find the last element in tree *)
     let rec last_elt (tr: tree) : elt =
       (match tr with 
@@ -787,10 +811,10 @@ struct
       | Leaf(_) -> Empty
       | OneBranch(e,_) -> Tree(Leaf(e))
       | TwoBranch(sym,e,t1,t2) ->
-          match sym, t1, t2 with
-          | _,Leaf(_),Leaf(_) -> Tree(OneBranch(e,get_top t1))
-          | Even,_,_ -> Tree(TwoBranch(Odd,e,t1,extract_tree (remaining t2)))
-          | Odd,_,_  -> Tree(TwoBranch(Even,e,extract_tree (remaining t1),t2))) in    
+        match sym, t1, t2 with
+        | _,Leaf(_),Leaf(_) -> Tree(OneBranch(e,get_top t1))
+        | Even,_,_ -> Tree(TwoBranch(Odd,e,t1,extract_tree (remaining t2)))
+        | Odd,_,_  -> Tree(TwoBranch(Even,e,extract_tree (remaining t1),t2))) in    
     (last_elt t, remaining t)
 
 
@@ -823,11 +847,85 @@ struct
       (match q1' with
       | Empty -> (e, Tree (fix (OneBranch (last, get_top t2))))
       | Tree t1' -> (e, Tree (fix (TwoBranch (Even, last, t1', t2)))))
+(*
+  let size (t:tree) : balance =
+    let rec tree_size (t:tree) : int =
+      match t with
+      | Leaf(_) -> 1
+      | OneBranch(_,e2) -> 1 + tree_size (Leaf e2)
+      | TwoBranch(_,_,t1,t2) -> 1 + (tree_size t1) + (tree_size t2) in
+    if ((tree_size t) mod 2 = 0) then Even
+    else Odd
+*)
+  let empty_test =
+    assert (empty = Empty)
+  
+  let is_empty_test =
+    assert (is_empty empty = true)
+    let x = C.generate () in
+    assert (is_empty (add x empty) = false)
+      
+  let add_test =
+    let x = C.generate () in
+    let t = (add x empty) in
+    assert (t = Tree (Leaf(x)));
+    let x2 = C.generate_gt x () in 
+    let x3 = C.generate_gt x2 () in
+    let t = (add x (add x2 (add x3 empty))) in
+    assert (t = Tree (TwoBranch(Even,x,Leaf(x3),Leaf(x2))));
+    let x2 = C.generate_lt x () in
+    let x3 = C.generate_lt x2 () in
+    let x4 = C.generate_lt x3 () in
+    let t = (add x (add x2 (add x3 (add x4 empty)))) in
+    assert (t = Tree (TwoBranch(Odd,x4,OneBranch(x3,x),Leaf(x2))));
+    ()
+ 
+(* not the best way...because i am hard coding it....ideally, would want to have it
+where i add the variables onto the tree...but add is a queue *)
+  let get_top_test =
+    let x = C.generate () in
+    let t = (Leaf(x)) in
+    assert (get_top t = x);
+    let x2 = C.generate_gt x () in
+    let t = (OneBranch(x,x2)) in
+    assert (get_top t = x);
+    let x3 = C.generate_gt x2 () in
+    let t = (TwoBranch(Even,x,Leaf(x3),Leaf(x2))) in
+    assert (get_top t = x);
+    let x = C.generate () in
+    let x2 = C.generate_lt x () in
+    let x3 = C.generate_lt x2 () in
+    let x4 = C.generate_lt x3 () in
+    let t = (TwoBranch(Odd,x4,OneBranch(x3,x),Leaf(x2))) in
+    assert (get_top t = x4);
+    ()
 
-  let run_tests () = raise ImplementMe
+  let fix_test =
+    let x = C.generate () in
+    let t = Leaf(x) in
+    assert (fix t = Leaf(x));
+    let x2 = C.generate_gt x () in
+    let x3 = C.generate_gt x2 () in
+    let x4 = C.generate_gt x3 () in
+    let t = (TwoBranch(Odd,x3,OneBranch(x,x2),Leaf(x4))) in
+    assert (fix t = TwoBranch(Odd,x,OneBranch(x2,x3),Leaf(x4)));
+    ()
+
+  let run_tests () =
+    is_empty_test;
+    empty_test;
+    add_test;
+    get_top_test;
+    (*get_last_test;
+    take_test;*)
+    fix_test;
+    
+
 end
 
+module BinHeapPriQ = BinaryHeap(IntCompare)
 
+let _ = BinHeapPriQ.run_tests()
 
 (* Now to actually use our priority queue implementations for something useful!
  *
@@ -920,6 +1018,7 @@ let selectionsort = sort list_module
  * Of course include your code for how you performed the measurements below.
  * Be convincing when establishing the algorithmic complexity of each sort.
  * See the Sys module for functions related to keeping track of time *)
-
+(*
 (*>* Problem N.2 *>*)
 let minutes_spent : int = raise ImplementMe
+*)

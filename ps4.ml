@@ -730,7 +730,11 @@ struct
 
   (* Simply returns the top element of the tree t (i.e., just a single pattern
    * match in *)
-  let get_top (t : tree) : elt = raise ImplementMe
+  let get_top (t : tree) : elt =
+    match t with
+    | Leaf(e) -> e
+    | OneBranch(e,_) -> e
+    | TwoBranch(_,e,_,_) -> e
 
   (* Takes a tree, and if the top node is greater than its children, fixes
    * it. If fixing it results in a subtree where the node is greater than its
@@ -755,7 +759,26 @@ struct
    * down into a new node at the bottom of the tree. *This* is the node
    * that we want you to return.
    *)
-  let rec get_last (t : tree) : elt * queue = raise ImplementMe
+  let rec get_last (t : tree) : elt * queue = 
+    (* Function to find the last element in tree *)
+    let rec last_elt (tr: tree) : elt =
+      (match tr with 
+      | Leaf(e) -> e
+      | OneBranch(_,e) -> e
+      | TwoBranch(Even,_,_,t) | TwoBranch(Odd,_,t,_) -> last_elt t) in  
+    
+    (*Function to find what's left after last elt is removed*)
+    let rec remaining (tr: tree) : queue = 
+      (match tr with 
+      | Leaf(_) -> Empty
+      | OneBranch(e,_) -> Tree(Leaf(e))
+      | TwoBranch(sym,e,t1,t2) ->
+          match sym, t1, t2 with
+          | _,Leaf(_),Leaf(_) -> Tree(OneBranch(e,get_top t1))
+          | Even,_,_ -> Tree(TwoBranch(Odd,e,t1,extract_tree (remaining t2)))
+          | Odd,_,_  -> Tree(TwoBranch(Even,e,extract_tree (remaining t1),t2))) in    
+    (last_elt t, remaining t)
+
 
   (* Implements the algorithm described in the writeup. You must finish this
    * implementation, as well as the implementations of get_last and fix, which

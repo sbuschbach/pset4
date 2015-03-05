@@ -739,7 +739,21 @@ struct
   (* Takes a tree, and if the top node is greater than its children, fixes
    * it. If fixing it results in a subtree where the node is greater than its
    * children, then you must (recursively) fix this tree too. *)
-  let rec fix (t : tree) : tree = raise ImplementMe
+  let rec fix (t : tree) : tree = 
+    match t with
+    | Leaf(e) -> t
+    
+    | OneBranch(e1,e2) ->
+      (match C.compare e1 e2 with
+      | Equal | Greater -> OneBranch(e2,e1)
+      | Less -> OneBranch(e1,e2))
+      
+    | TwoBranch(sym,e1,t1,t2) -> 
+      if C.compare e1 (get_top t2) = Greater then
+	    TwoBranch(sym, get_top t2, fix t1, fix (add e1 t2))
+      else if C.compare e1 (get_top t1) = Greater then 
+	    TwoBranch(sym, get_top t1, fix (add e1 t1), fix t2)
+      else TwoBranch(sym,e1,t1,t2)
 
   let extract_tree (q : queue) : tree =
     match q with

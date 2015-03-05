@@ -1,6 +1,6 @@
 (* PS4
- * Author: Cindy Zou
- * Partner: Steve Buschbach
+ * Author: Steven Buschbach
+ * Partner: Cindy Zou
  *)
 
 (* NOTE: Please read (and understand) all of the comments in this file! 
@@ -568,7 +568,7 @@ struct
 
   let add (e : elt) (q : queue) = T.insert e q
                                       
-  let take (q : queue) = T.pull_min q
+  let take (q : queue) = ((T.getmin q), (T.delete (T.getmin q) q))  
   
   (* Testing Functions *)
   let empty_test =
@@ -577,33 +577,29 @@ struct
   let is_empty_test =
     assert (is_empty empty = true)
     let x = C.generate () in
-    assert (is_empty Branch(Leaf,[x],Leaf)= false)
+    assert (is_empty (add x empty) = false)
     
   let add_test = 
     let x = C.generate () in
     let x2 = C.generate_lt x () in
-    assert (add x (add x2 empty) = Branch(Branch(Leaf,[x2],Leaf),[x],Leaf))  
+    assert (add x (add x2 empty) = T.insert x (T.insert x2 T.empty))
     let x = C.generate () in
-    assert (add x empty = [x]) = Branch(Leaf,[x],Leaf)
+    assert (add x empty = T.insert x T.empty)
     let x = C.generate () in
     let x3 = C.generate_gt x () in
-    assert (add x (add x3 empty) = Branch(Leaf,[x],Branch(Leaf,[x2],Leaf)))
+    assert (add x (add x3 empty) = T.insert x (T.insert x3 T.empty))
     let x = C.generate () in
     let x4 = x in
-    assert (add x (add x4 empty) = Branch(Leaf,[x4;x],Leaf))
+    assert (add x (add x4 empty) = T.insert x (T.insert x4 T.empty))
   
   let take_test = 
     let x = C.generate () in
     let x2 = C.generate_lt x () in
     let x3 = C.generate_gt x () in
-    assert (take Branch() = (x2, [x;x3]))    
+    assert (take (add x (add x2 (add x3 empty))) = 
+              (x2, (T.insert x (T.insert x3 T.empty))))
     let x = C.generate () in
-    assert (take Branch(Leaf,[x],Leaf) = (x, Leaf))
-    let x = C.generate () in
-    let x4 = x in
-    let x5 = C.generate_lt x in
-    assert (take Branch(Branch(Leaf,[x5],Leaf),[x;x4],Leaf) = 
-              (x5, Branch(Leaf,[x;x4],Leaf)))
+    assert (take (add x empty) = (x, T.empty))
     
   let run_tests () = 
     take_test ;

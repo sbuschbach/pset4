@@ -185,7 +185,7 @@ struct
   let empty = Leaf
 
 
-(*>* Problem 2.0 *>*)
+  (*>* Problem 2.0 *>*)
 
   (* Define a method to insert element x into the tree t.
    * The left subtree of a given node should only have "smaller"
@@ -209,7 +209,7 @@ struct
 	|Less -> Branch(insert x left,lst,right)
 	|Greater -> Branch(left,lst,insert x right)
 
-(*>* Problem 2.1 *>*)
+  (*>* Problem 2.1 *>*)
 
   (* Returns true if the element x is in tree t, else false *)
   (* Hint: multiple values might compare Equal to x, but
@@ -280,7 +280,7 @@ struct
             | _, Leaf -> l
             | _ -> let v, r' = pull_min r in Branch (l,v,r')
 
-(*>* Problem 2.2 *>*)
+  (*>* Problem 2.2 *>*)
 
   (* Simply returns the minimum value of the tree t. If there are multiple
    * minimum values, it should return the one that was inserted first (note
@@ -298,12 +298,12 @@ struct
     match List.rev min with 
     | [] -> failwith "Invalid tree: empty list as node"
     | hd::_ -> hd
-            
-(*>* Problem 2.3 *>*)
+      
+  (*>* Problem 2.3 *>*)
 
   (* Simply returns the maximum value of the tree t. Similarly should
    * return the last element in the matching list. *)
- 
+      
   let rec pull_max (t : tree) : elt list * tree =
     match t with
     | Leaf -> raise EmptyTree
@@ -315,7 +315,7 @@ struct
     match List.rev max with 
     | [] -> failwith "Invalid tree: empty list as node"
     | hd::_ -> hd
-    
+      
   let test_insert () =
     let x = C.generate () in
     let t = insert x empty in
@@ -328,7 +328,7 @@ struct
     let z = C.generate_lt x () in
     let t = insert z t in
     assert (t = Branch(Branch(Leaf, [z], Leaf),[x;x],
-                Branch(Leaf, [y], Leaf)));
+                       Branch(Leaf, [y], Leaf)));
     (* Can add further cases here *)
     ()
 
@@ -378,7 +378,7 @@ struct
     let t = insert x5 t in
     assert (getmax t = x5);
     ()
-   
+      
   let test_getmin () =
     let x = C.generate () in
     let x2 = C.generate_gt x () in
@@ -388,7 +388,7 @@ struct
     assert (getmin (insert x2 (insert x4 (insert x (insert x3 empty)))) = x);
     assert (getmin (insert x3 (insert x (insert x2 empty))) = x);
     ()
- 
+      
   let test_delete () =
     let x = C.generate () in
     let x2 = C.generate_lt x () in
@@ -483,14 +483,14 @@ struct
 
   type queue = elt list
 
-(*>* Problem 3.1 *>*)
+  (*>* Problem 3.1 *>*)
   let empty = []
 
-(*>* Problem 3.2 *>*)
+  (*>* Problem 3.2 *>*)
   let is_empty (t : queue) = if t = [] then true else false
 
 
-(*>* Problem 3.3 *>*)
+  (*>* Problem 3.3 *>*)
 
   (* Like with getmin and getmax in your binary tree, you should implement
    * add and take such that, if all elements have the same priority, this
@@ -502,38 +502,38 @@ struct
     | [] -> [e]
     | hd::tl -> if C.compare hd e = Greater then e::hd::tl else hd::(add e tl)
 
-(*>* Problem 3.4 *>*)
+  (*>* Problem 3.4 *>*)
   let take (q : queue) =
     match q with
     | [] -> raise QueueEmpty
     | hd::tl -> (hd, tl)
 
-(* Testing Functions *)  
+  (* Testing Functions *)  
   let empty_test =
     assert (empty = [])
-   
+      
   let is_empty_test =
     assert (is_empty empty = true)
-    let x = C.generate () in
-    assert (is_empty [x] = false)
+  let x = C.generate () in
+  assert (is_empty [x] = false)
     
   let add_test = 
     let x = C.generate () in
     let x2 = C.generate_lt x () in
     assert (add x [x2] = [x2; x])   
-    let x = C.generate () in
-    assert (add x empty = [x])    
-    let x = C.generate () in
-    let x3 = C.generate_gt x () in
-    assert (add x [x3] = [x; x3])
-  
+  let x = C.generate () in
+  assert (add x empty = [x])    
+  let x = C.generate () in
+  let x3 = C.generate_gt x () in
+  assert (add x [x3] = [x; x3])
+    
   let take_test = 
     let x = C.generate () in
     let x2 = C.generate_lt x () in
     let x3 = C.generate_gt x () in
     assert (take [x2;x;x3] = (x2, [x;x3]))   
-    let x = C.generate () in
-    assert (take [x] = (x, []))
+  let x = C.generate () in
+  assert (take [x] = (x, []))
     
   let run_tests () = 
     take_test ;
@@ -565,30 +565,30 @@ struct
   module T = (BinSTree(C) : (BINTREE with type elt = C.t))
 
   (* Implement the remainder of the module! *)
-  
+    
   type elt = C.t
-  
+    
   type queue = T.tree
-  
+    
   let empty = T.empty
-  
+    
   let is_empty (t : queue) = if t = T.empty then true else false
 
   let add (e : elt) (q : queue) = T.insert e q
-                                      
+    
   let take (q : queue) = ((T.getmin q), (T.delete (T.getmin q) q))  
-  
+    
   (* Testing Functions *)
   let empty_test =
     assert (empty = T.empty);
     ()
-  
+      
   let is_empty_test =
     assert (is_empty empty = true);
     let x = C.generate () in
     assert (is_empty (add x empty) = false);
     ()
-    
+      
   let add_test = 
     let x = C.generate () in
     let x2 = C.generate_lt x () in
@@ -599,16 +599,16 @@ struct
     let x4 = x in
     assert (add x (add x4 empty) = T.insert x (T.insert x4 T.empty));
     ()
-  
+      
   let take_test = 
     let x = C.generate () in
     let x2 = C.generate_lt x () in
     let x3 = C.generate_gt x () in
     assert (take (add x (add x2 (add x3 empty))) = 
-              (x2, (T.insert x (T.insert x3 T.empty))));
+        (x2, (T.insert x (T.insert x3 T.empty))));
     assert (take (add x empty) = (x, T.empty));
     ()
-    
+      
   let run_tests () = 
     take_test ;
     add_test ;
@@ -670,8 +670,8 @@ struct
    * the tuple is the element at this node, and the second elt is the element
    * down the branch), or has two branches (with the node being even or odd) *)
   type tree =   TwoBranch of balance * elt * tree * tree
-              | OneBranch of elt * elt
-              | Leaf of elt
+		| OneBranch of elt * elt
+		| Leaf of elt
 
   (* A queue is either empty, or a tree *)
   type queue = Empty | Tree of tree
@@ -692,21 +692,21 @@ struct
       (* If the tree is just a Leaf, then we end up with a OneBranch *)
       | Leaf e1 ->
         (match C.compare e e1 with
-         | Equal | Greater -> OneBranch (e1, e)
-         | Less -> OneBranch (e, e1))
+        | Equal | Greater -> OneBranch (e1, e)
+        | Less -> OneBranch (e, e1))
 
       (* If the tree was a OneBranch, it will now be a TwoBranch *)
       | OneBranch(e1, e2) ->
         (match C.compare e e1 with
-         | Equal | Greater -> TwoBranch (Even, e1, Leaf e2, Leaf e)
-         | Less -> TwoBranch (Even, e, Leaf e2, Leaf e1))
+        | Equal | Greater -> TwoBranch (Even, e1, Leaf e2, Leaf e)
+        | Less -> TwoBranch (Even, e, Leaf e2, Leaf e1))
 
       (* If the tree was even, then it will become an odd tree (and the element
        * is inserted to the left *)
       | TwoBranch(Even, e1, t1, t2) ->
         (match C.compare e e1 with
-         | Equal | Greater -> TwoBranch(Odd, e1, add_to_tree e t1, t2)
-         | Less -> TwoBranch(Odd, e, add_to_tree e1 t1, t2))
+        | Equal | Greater -> TwoBranch(Odd, e1, add_to_tree e t1, t2)
+        | Less -> TwoBranch(Odd, e, add_to_tree e1 t1, t2))
 
       (* If the tree was odd, then it will become an even tree (and the element
        * is inserted to the right *)
@@ -737,29 +737,29 @@ struct
     | Leaf(_) -> t
 
     | OneBranch(e1,e2) ->
-	    (match C.compare e1 e2 with
-	     | Equal | Greater -> OneBranch(e2,e1)
-	     | Less -> OneBranch(e1,e2))
+      (match C.compare e1 e2 with
+      | Equal | Greater -> OneBranch(e2,e1)
+      | Less -> OneBranch(e1,e2))
 
     | TwoBranch(sym,e1,t1,t2) -> 
-	    if C.compare e1 (get_top t2) = Greater then
-	     (match t2 with
-	     | Leaf(t2_hd) -> fix(TwoBranch(sym,t2_hd,t1,Leaf(e1)))
-	     | OneBranch(t2_hd,t2_tl) -> fix(TwoBranch(sym,t2_hd,t1,
-     	    fix(OneBranch(e1,t2_tl))))
-	     | TwoBranch(sym,t2_hd,t2_t1,t2_t2) ->
-            fix(TwoBranch(sym,t2_hd,t1,fix(TwoBranch(sym,e1,t2_t1,t2_t2)))))
+      if C.compare e1 (get_top t2) = Greater then
+	(match t2 with
+	| Leaf(t2_hd) -> fix(TwoBranch(sym,t2_hd,t1,Leaf(e1)))
+	| OneBranch(t2_hd,t2_tl) -> fix(TwoBranch(sym,t2_hd,t1,
+     						  fix(OneBranch(e1,t2_tl))))
+	| TwoBranch(sym,t2_hd,t2_t1,t2_t2) ->
+          fix(TwoBranch(sym,t2_hd,t1,fix(TwoBranch(sym,e1,t2_t1,t2_t2)))))
 
-        else if C.compare e1 (get_top t1) = Greater then  
-	     (match t1 with
-	     | Leaf(t1_hd) -> fix(TwoBranch(sym,t1_hd,Leaf(e1),t2)) 
-	     | OneBranch(t1_hd,t1_tl) -> fix(TwoBranch(sym,t1_hd,
-						               fix(OneBranch(e1,t1_tl)),t2))
-         | TwoBranch(sym,t1_hd,t1_t1,t1_t2) ->
-	         fix(TwoBranch(sym,t1_hd,fix(TwoBranch(sym,e1,t1_t1,t1_t2)),t2)))
+      else if C.compare e1 (get_top t1) = Greater then  
+	(match t1 with
+	| Leaf(t1_hd) -> fix(TwoBranch(sym,t1_hd,Leaf(e1),t2)) 
+	| OneBranch(t1_hd,t1_tl) -> fix(TwoBranch(sym,t1_hd,
+						  fix(OneBranch(e1,t1_tl)),t2))
+        | TwoBranch(sym,t1_hd,t1_t1,t1_t2) ->
+	  fix(TwoBranch(sym,t1_hd,fix(TwoBranch(sym,e1,t1_t1,t1_t2)),t2)))
 
-	    else TwoBranch(sym,e1,t1,t2)
-	      
+      else TwoBranch(sym,e1,t1,t2)
+	
   let extract_tree (q : queue) : tree =
     match q with
     | Empty -> raise QueueEmpty
@@ -820,29 +820,31 @@ struct
       (match q2' with
        (* If one branch of the tree was just a leaf, we now have just
         * a OneBranch *)
-       | Empty -> (e, Tree (fix (OneBranch (last, get_top t1))))
-       | Tree t2' -> (e, Tree (fix (TwoBranch (Odd, last, t1, t2')))))
+      | Empty -> (e, Tree (fix (OneBranch (last, get_top t1))))
+      | Tree t2' -> (e, Tree (fix (TwoBranch (Odd, last, t1, t2')))))
     (* Implement the odd case! *)
     | TwoBranch (Odd, e, t1, t2) -> 
       let (last, q1') = get_last t1 in
-        (e, Tree (fix (TwoBranch(Even, last, extract_tree q1', t2))))
-       
-(*
-  let size (t:tree) : balance =
+      (match q1' with
+      | Empty -> (e, Tree (fix (OneBranch (last, get_top t2))))
+      | Tree t1' -> (e, Tree (fix (TwoBranch (Even, last, t1', t2)))))
+	
+  (*
+    let size (t:tree) : balance =
     let rec tree_size (t:tree) : int =
-      match t with
-      | Leaf(_) -> 1
-      | OneBranch(_,e2) -> 1 + tree_size (Leaf e2)
-      | TwoBranch(_,_,t1,t2) -> 1 + (tree_size t1) + (tree_size t2) in
+    match t with
+    | Leaf(_) -> 1
+    | OneBranch(_,e2) -> 1 + tree_size (Leaf e2)
+    | TwoBranch(_,_,t1,t2) -> 1 + (tree_size t1) + (tree_size t2) in
     if ((tree_size t) mod 2 = 0) then Even
     else Odd
-*)
+  *)
 
-(*Testing Functions *)
+  (*Testing Functions *)
   let empty_test =
     assert (empty = Empty);
     ()
-  
+      
   let is_empty_test =
     assert (is_empty empty = true);
     let x = C.generate () in
@@ -863,9 +865,9 @@ struct
     let t = (add x (add x2 (add x3 (add x4 empty)))) in
     assert (t = Tree (TwoBranch(Odd,x4,OneBranch(x3,x),Leaf(x2))));
     ()
- 
-(* not the best way...because i am hard coding it....ideally, would want to have it
-where i add the variables onto the tree...but add is a queue *)
+      
+  (* not the best way...because i am hard coding it....ideally, would want to have it
+     where i add the variables onto the tree...but add is a queue *)
   let get_top_test =
     let x = C.generate () in
     let t = (Leaf(x)) in
@@ -893,10 +895,10 @@ where i add the variables onto the tree...but add is a queue *)
     let x4 = C.generate_gt x3 () in
     let t = (TwoBranch(Odd,x3,OneBranch(x,x2),Leaf(x4))) in
     assert (fix t = TwoBranch(Odd,x,OneBranch(x2,x3),Leaf(x4)));
-    let t = (TwoBranch(Even,x4,Leaf(x2),Leaf(x))) in
-    assert (fix t = TwoBranch(Even,x,Leaf(x2,Leaf(x4)));
+    let z = (OneBranch(x4,x)) in
+    assert (fix z = OneBranch(x,x4));
     ()
-  
+      
   let get_last_test = 
     let x = C.generate () in
     let x2 = C.generate_gt x () in
@@ -911,30 +913,30 @@ where i add the variables onto the tree...but add is a queue *)
     let t4 = (Leaf(x)) in
     assert (get_last t4 = (x, Empty));
     ()
-  
+      
   let take_test =
     let x = C.generate () in
     let x2 = C.generate_gt x () in
-    let x3 = C.generate_gt x2 () in
+    (*let x3 = C.generate_gt x2 () in
     let x4 = C.generate_gt x3 () in
     let t = Tree(TwoBranch(Odd,x,OneBranch(x2,x4),Leaf(x3))) in
-    assert (take t = (x, Tree(TwoBranch(Even,x4,Leaf(x2),Leaf(x3)))));
-    let t2 = Tree(TwoBranch(Even,x,Leaf(x2),Leaf(x3))) in
-    assert (take t2 = (x, Tree(OneBranch(x3,x2))));
+      assert (take t = (x, Tree(TwoBranch(Even,x4,Leaf(x2),Leaf(x3)))));
+      let t2 = Tree(TwoBranch(Even,x,Leaf(x2),Leaf(x3))) in
+      assert (take t2 = (x, Tree(OneBranch(x3,x2))));*)
     let t3 = Tree(OneBranch(x,x2)) in
     assert (take t3 = (x, Tree(Leaf(x2))));
     let t4 = Tree(Leaf(x)) in
     assert (take t4 = (x, Empty));
     ()
-  
+      
   let run_tests () =
     is_empty_test;
     empty_test;
     add_test;
     get_top_test;
     get_last_test;
-    fix_test;
     take_test;
+    fix_test;
     
 end
 
@@ -960,11 +962,11 @@ let _ = BinHeapPriQ.run_tests()
  * tailored for ints
  *)
 module IntListQueue = (ListQueue(IntCompare) :
-                        PRIOQUEUE with type elt = IntCompare.t)
+                         PRIOQUEUE with type elt = IntCompare.t)
 module IntHeapQueue = (BinaryHeap(IntCompare) :
-                        PRIOQUEUE with type elt = IntCompare.t)
+                         PRIOQUEUE with type elt = IntCompare.t)
 module IntTreeQueue = (TreeQueue(IntCompare) :
-                        PRIOQUEUE with type elt = IntCompare.t)
+                         PRIOQUEUE with type elt = IntCompare.t)
 
 (* store the whole modules in these variables *)
 let list_module = (module IntListQueue : PRIOQUEUE with type elt = IntCompare.t)
@@ -977,8 +979,8 @@ let sort (m : (module PRIOQUEUE with type elt=IntCompare.t)) (lst : int list) =
 
   let rec extractor pq lst =
     if P.is_empty pq then lst else
-    let (x, pq') = P.take pq in
-    extractor pq' (x::lst) in
+      let (x, pq') = P.take pq in
+      extractor pq' (x::lst) in
   let pq = List.fold_right ~f:P.add ~init:P.empty lst in
   List.rev (extractor pq [])
 

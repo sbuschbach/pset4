@@ -197,10 +197,14 @@ struct
    * Hint: use C.compare. See delete for inspiration
    *)
 
+  (* insert element into tree and returns tree; inserted element
+   * at the head of the list *)
   let rec insert (x : elt) (t : tree) : tree =
+    (* outer cases of empty or nonempty tree *)
     match t with
     | Leaf -> Branch(Leaf,[x],Leaf)
     | Branch(left,lst,right) ->
+      (* reach into the list that is at the central node *)
       match lst with
       | [] -> failwith "Invalid tree: empty list as node"
       | hd::_ ->
@@ -216,21 +220,27 @@ struct
    * that doesn't necessarily mean that x itself is in the
    * tree.
    *)
+
+  (* search through the tree and list within a node to find value x *)
   let rec search (x : elt) (t : tree) : bool = 
+    (* helper function to search within list in node *)
     let rec lst_search (x : elt) (lst: elt list) : bool  =
       match lst with
       | [] -> false
       | hd::tl -> if x = hd then true else lst_search x tl
     in 
+    (* outer cases *)
     match t with
     | Leaf -> raise EmptyTree
     | Branch(left,lst,right) ->
       match lst with
       | [] -> failwith "Invalid tree: empty list as node"
       | hd::_ ->
+	(* comparing the nodes *)
 	match C.compare x hd with
 	|Less -> search x left
 	|Greater -> search x right
+	(* comparing the list within the node *)
 	|Equal -> lst_search x lst
 
   (* A useful function for removing the node with the minimum value from
@@ -249,6 +259,7 @@ struct
    * it's in the structure, it doesn't necessarily need to show up in the
    * signature.
    *)
+
   let rec pull_min (t : tree) : elt list * tree =
     match t with
     | Leaf -> raise EmptyTree
@@ -293,6 +304,7 @@ struct
    * The exception "EmptyTree", defined within this module, might come in
    * handy. *)
 
+  (* return the minimum value of the tree *)
   let getmin (t : tree) : elt = 
     let (min, _) = pull_min t in 
     match List.rev min with 
@@ -304,25 +316,17 @@ struct
   (* Simply returns the maximum value of the tree t. Similarly should
    * return the last element in the matching list. *)
  
+  (* returns the maximum value *)
   let rec getmax (t: tree) : elt =
     match t with
     | Leaf -> raise EmptyTree
+    (* if just one value, then same result as getmin
+     * which returns the last of the list *)
     | Branch(Leaf,_,Leaf) -> getmin t
+    (* if more than one, just take out the minimum value until only 
+     * one value left *)
     | Branch(_,_,_) -> let (_,t') = pull_min t in getmax t'
 
-(*
-
-  let rec pull_max (t : tree) : elt list * tree =
-    match t with
-    | Leaf -> raise EmptyTree
-    | Branch (l, v, Leaf) -> (v, l)
-    | Branch (l, v, r) -> let max, t' = pull_max r in (max, Branch (l, v, t'))
-
-  let getmax (t : tree) : elt = 
-    let (max, _) = pull_max t in
-    match List.rev max with 
-    | [] -> failwith "Invalid tree: empty list as node"
-    | hd::_ -> hd*)
     
   let test_insert () =
     let x = C.generate () in
@@ -378,7 +382,7 @@ struct
     let x3 = C.generate_lt x2 () in
     let x4 = C.generate_lt x3 () in
     assert (getmax (insert x empty) = x);
-    assert (getmax (insert x3 (insert x (insert x2 empty))) = x);
+    assert (getmax (insert x3 (insert x empty)) = x);
     assert (getmax (insert x2 (insert x (insert x3 empty))) = x);
     let t = (insert x4 (insert x3 (insert x2 (insert x empty)))) in
     assert (getmax t = x);
@@ -393,8 +397,13 @@ struct
     let x3 = C.generate_gt x2 () in
     let x4 = C.generate_gt x3 () in
     assert (getmin (insert x empty) = x);
+    assert (getmin (insert x3 (insert x empty)) = x);
     assert (getmin (insert x2 (insert x4 (insert x (insert x3 empty)))) = x);
-    assert (getmin (insert x3 (insert x (insert x2 empty))) = x);
+    let t = (insert x4 (insert x3 (insert x2 (insert x empty)))) in
+    assert (getmin t = x);
+    let x5 = C.generate_lt x () in
+    let t = insert x5 t in
+    assert (getmin t = x5);
     ()
  
   let test_delete () =
@@ -580,7 +589,7 @@ struct
   
   let empty = T.empty
   
-  let is_empty (t : queue) = if t = T.empty then true else false
+  let is_empty (q : queue) = if q = T.empty then true else false
 
   let add (e : elt) (q : queue) = T.insert e q
                                       
@@ -743,30 +752,27 @@ struct
   let rec fix (t : tree) : tree =
     match t with
     | Leaf(_) -> t
-
+      
     | OneBranch(e1,e2) ->
-	    (match C.compare e1 e2 with
-	     | Equal | Greater -> OneBranch(e2,e1)
-	     | Less -> OneBranch(e1,e2))
+      (match C.compare e1 e2 with
+      | Equal | Greater -> OneBranch(e2,e1)
+      | Less -> OneBranch(e1,e2))
 
     | TwoBranch(sym,e1,t1,t2) -> 
-	    if C.compare e1 (get_top t2) = Greater then
-	     (match t2 with
-	     | Leaf(t2_hd) -> fix(TwoBranch(sym,t2_hd,t1,Leaf(e1)))
-	     | OneBranch(t2_hd,t2_tl) -> fix(TwoBranch(sym,t2_hd,t1,
-     	    fix(OneBranch(e1,t2_tl))))
+      let smallt = 
+	if (C.compare (get_top t1) (get_top t2) = Less) then t1 else t2 in
+      let larget =
+	if (smallt = t1) then t2 else t1 in
+
+      if C.compare e1 (get_top smallt) = Greater then
+	     (match smallt with
+	     | Leaf(t2_hd) -> TwoBranch(sym,t2_hd,Leaf(e1),larget)
+	     | OneBranch(t2_hd,t2_tl) -> 
+	       TwoBranch(sym,t2_hd,fix(OneBranch(e1,t2_tl)),larget)
 	     | TwoBranch(sym,t2_hd,t2_t1,t2_t2) ->
-            fix(TwoBranch(sym,t2_hd,t1,fix(TwoBranch(sym,e1,t2_t1,t2_t2)))))
+               TwoBranch(sym,t2_hd,fix(TwoBranch(sym,e1,t2_t1,t2_t2)),larget))
 
-        else if C.compare e1 (get_top t1) = Greater then  
-	     (match t1 with
-	     | Leaf(t1_hd) -> fix(TwoBranch(sym,t1_hd,Leaf(e1),t2)) 
-	     | OneBranch(t1_hd,t1_tl) -> fix(TwoBranch(sym,t1_hd,
-						               fix(OneBranch(e1,t1_tl)),t2))
-         | TwoBranch(sym,t1_hd,t1_t1,t1_t2) ->
-	         fix(TwoBranch(sym,t1_hd,fix(TwoBranch(sym,e1,t1_t1,t1_t2)),t2)))
-
-	    else TwoBranch(sym,e1,t1,t2)
+      else TwoBranch(sym,e1,t1,t2)
 	      
   let extract_tree (q : queue) : tree =
     match q with
@@ -834,17 +840,6 @@ struct
     | TwoBranch (Odd, e, t1, t2) -> 
       let (last, q1') = get_last t1 in
         (e, Tree (fix (TwoBranch(Even, last, extract_tree q1', t2))))
-       
-(*
-  let size (t:tree) : balance =
-    let rec tree_size (t:tree) : int =
-      match t with
-      | Leaf(_) -> 1
-      | OneBranch(_,e2) -> 1 + tree_size (Leaf e2)
-      | TwoBranch(_,_,t1,t2) -> 1 + (tree_size t1) + (tree_size t2) in
-    if ((tree_size t) mod 2 = 0) then Even
-    else Odd
-*)
 
 (*Testing Functions *)
   let empty_test =
@@ -872,8 +867,6 @@ struct
     assert (t = Tree (TwoBranch(Odd,x4,OneBranch(x3,x),Leaf(x2))));
     ()
  
-(* not the best way...because i am hard coding it....ideally, would want to have it
-where i add the variables onto the tree...but add is a queue *)
   let get_top_test =
     let x = C.generate () in
     let t = (Leaf(x)) in
@@ -902,7 +895,7 @@ where i add the variables onto the tree...but add is a queue *)
     let t = (TwoBranch(Odd,x3,OneBranch(x,x2),Leaf(x4))) in
     assert (fix t = TwoBranch(Odd,x,OneBranch(x2,x3),Leaf(x4)));
     let t = (TwoBranch(Even,x4,Leaf(x2),Leaf(x))) in
-    assert (fix t = TwoBranch(Even,x,Leaf(x2),Leaf(x4)));
+    assert (fix t = TwoBranch(Even,x,Leaf(x4),Leaf(x2)));
     ()
   
   let get_last_test = 
@@ -926,7 +919,7 @@ where i add the variables onto the tree...but add is a queue *)
     let x3 = C.generate_gt x2 () in
     let x4 = C.generate_gt x3 () in
     let t = Tree(TwoBranch(Odd,x,OneBranch(x2,x4),Leaf(x3))) in
-    assert (take t = (x, Tree(TwoBranch(Even,x2,Leaf(x3),Leaf(x4)))));
+    assert (take t = (x, Tree(TwoBranch(Even,x2,Leaf(x4),Leaf(x3)))));
     let t2 = Tree(TwoBranch(Even,x,Leaf(x2),Leaf(x3))) in
     assert (take t2 = (x, Tree(OneBranch(x2,x3))));
     let t3 = Tree(OneBranch(x,x2)) in
@@ -1009,6 +1002,15 @@ let selectionsort = sort list_module
 
 (* You should test that these sorts all correctly work, and that
  * lists are returned in non-decreasing order!! *)
+assert(heapsort [] = []);;
+assert(heapsort [3;5;1;2] = [1;2;3;5]);;
+assert(heapsort [1;1;2] = [1;1;2]);;
+assert(treesort [] = []);;
+assert(treesort [3;5;1;2] = [1;2;3;5]);;
+assert(treesort [1;1;2] = [1;1;2]);;
+assert(selectionsort [] = []);;
+assert(selectionsort [3;5;1;2] = [1;2;3;5]);;
+assert(selectionsort [1;1;2] = [1;1;2]);;
 
 
 (*****************************************************************************)
@@ -1021,6 +1023,9 @@ let selectionsort = sort list_module
  * a COMPARABLE module as an argument, and allows for sorting on the
  * type defined by that module. You should use your BinaryHeap module.
  *)
+
+module CompModule(C : COMPARABLE) : PRIOQUEUE with type elt = C.t
+  = (BinaryHeap(C) : PRIOQUEUE with type elt = C.t)
 
 (*>* Problem N.1 *>*)
 (* Challenge problem:

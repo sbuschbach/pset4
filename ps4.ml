@@ -304,6 +304,14 @@ struct
   (* Simply returns the maximum value of the tree t. Similarly should
    * return the last element in the matching list. *)
  
+  let rec getmax (t: tree) : elt =
+    match t with
+    | Leaf -> raise EmptyTree
+    | Branch(Leaf,_,Leaf) -> getmin t
+    | Branch(_,_,_) -> let (_,t') = pull_min t in getmax t'
+
+(*
+
   let rec pull_max (t : tree) : elt list * tree =
     match t with
     | Leaf -> raise EmptyTree
@@ -314,7 +322,7 @@ struct
     let (max, _) = pull_max t in
     match List.rev max with 
     | [] -> failwith "Invalid tree: empty list as node"
-    | hd::_ -> hd
+    | hd::_ -> hd*)
     
   let test_insert () =
     let x = C.generate () in

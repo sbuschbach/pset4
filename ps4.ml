@@ -825,9 +825,7 @@ struct
     (* Implement the odd case! *)
     | TwoBranch (Odd, e, t1, t2) -> 
       let (last, q1') = get_last t1 in
-      (match q1' with
-       | Empty -> (e, Tree (fix (OneBranch (last, get_top t2))))
-       | Tree t1' -> (e, Tree (fix (TwoBranch (Even, last, t1', t2)))))
+        (e, Tree (fix (TwoBranch(Even, last, extract_tree q1', t2))))
        
 (*
   let size (t:tree) : balance =
@@ -917,10 +915,10 @@ where i add the variables onto the tree...but add is a queue *)
     let x2 = C.generate_gt x () in
     let x3 = C.generate_gt x2 () in
     let x4 = C.generate_gt x3 () in
-    (*let t = Tree(TwoBranch(Odd,x,OneBranch(x2,x4),Leaf(x3))) in
+    let t = Tree(TwoBranch(Odd,x,OneBranch(x2,x4),Leaf(x3))) in
     assert (take t = (x, Tree(TwoBranch(Even,x4,Leaf(x2),Leaf(x3)))));
     let t2 = Tree(TwoBranch(Even,x,Leaf(x2),Leaf(x3))) in
-    assert (take t2 = (x, Tree(OneBranch(x3,x2))));*)
+    assert (take t2 = (x, Tree(OneBranch(x3,x2))));
     let t3 = Tree(OneBranch(x,x2)) in
     assert (take t3 = (x, Tree(Leaf(x2))));
     let t4 = Tree(Leaf(x)) in

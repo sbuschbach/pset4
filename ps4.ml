@@ -893,6 +893,8 @@ where i add the variables onto the tree...but add is a queue *)
     let x4 = C.generate_gt x3 () in
     let t = (TwoBranch(Odd,x3,OneBranch(x,x2),Leaf(x4))) in
     assert (fix t = TwoBranch(Odd,x,OneBranch(x2,x3),Leaf(x4)));
+    let t = (TwoBranch(Even,x4,Leaf(x2),Leaf(x))) in
+    assert (fix t = TwoBranch(Even,x,Leaf(x2,Leaf(x4)));
     ()
   
   let get_last_test = 
@@ -931,8 +933,8 @@ where i add the variables onto the tree...but add is a queue *)
     add_test;
     get_top_test;
     get_last_test;
-    take_test;
     fix_test;
+    take_test;
     
 end
 
